@@ -1,0 +1,33 @@
+{
+  "name": "monitoria-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaroslank/monitoria-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaroslank/monitoria-api/issues"
+  },
+  "homepage": "https://github.com/jaroslank/monitoria-api#readme",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.0",
+    "mysql2": "^3.14.1",
+    "nodemon": "^3.1.10",
+    "passport": "^0.7.0",
+    "passport-oauth2": "^1.8.0"
+  }
+}
