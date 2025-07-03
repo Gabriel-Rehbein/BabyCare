@@ -6,10 +6,7 @@ const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'monitoria_db',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  database: 'monitoria_db'
 });
 
 module.exports = pool;
