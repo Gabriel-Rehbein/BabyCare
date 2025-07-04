@@ -7,15 +7,14 @@ passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
-// Busca o usuário completo no banco de dados usando o ID da sessão
 passport.deserializeUser(async (id, done) => {
-    // Aqui você precisaria de uma função 'buscarPorId' no seu repositório
-    // Por enquanto, vamos simplificar (o ideal é implementar o buscarPorId)
-    // const user = await usuarioRepository.buscarPorId(id);
-    // done(null, user);
-    done(null, { id: id }); // Placeholder
+    try {
+        const user = await usuarioRepository.buscarPorId(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
 });
-
 
 passport.use(
     new GoogleStrategy({

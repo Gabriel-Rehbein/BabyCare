@@ -1,1 +1,0 @@
-//Carrega variáveis de ambiente

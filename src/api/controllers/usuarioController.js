@@ -1,5 +1,16 @@
 const usuarioService = require('../services/usuarioService');
 
+const buscarPorId = async (req, res) => {
+    try {
+
+        const usuario = await usuarioService.buscarPorId();
+        res.status(200).json(usuario);
+
+    } catch(error) {
+        res.status(500).json({message: "Ocorreu um erro ao buscar o usuário.", error: error.message});
+    }
+};
+
 const getAllUsers = async (req, res) => {
     try {
 
@@ -12,5 +23,6 @@ const getAllUsers = async (req, res) => {
 };
 
 module.exports = {
+    buscarPorId,
     getAllUsers
 };
