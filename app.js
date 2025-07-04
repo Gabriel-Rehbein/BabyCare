@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const ApiError = require('./src/utils/ApiError'); 
 const session = require('express-session');
 const passport = require('passport');
@@ -8,6 +9,11 @@ const app = express();
 
 require('dotenv').config();
 require('./src/config/passport-setup');
+
+app.use(cors({
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'], // Adicione a URL do seu Live Server
+  credentials: true
+}));
 
 app.get('/', (req, res) => {
   res.status(200).json({

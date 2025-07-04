@@ -57,9 +57,13 @@ const atualizarUsuario = async (req, res, next) => {
 
 const removerUsuario = async (req, res, next) => {
     try {
+        const {id} = req.params;
 
+        await usuarioService.remover(id);
+
+        res.status(200).json({message: 'Usuário removido com sucesso'});
     } catch (error) {
-
+        next(error);
     }
 };
 
