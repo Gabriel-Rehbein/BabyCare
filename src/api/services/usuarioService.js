@@ -1,37 +1,120 @@
+const ApiError = require('../../utils/ApiError');
 const usuarioRepository = require('../repository/usuarioRepository');
+const bcrypt = require('bcrypt');
 
-async function buscarPorId() {
+async function listar() {
     try{
+        const usuarios = await usuarioRepository.listar();
 
-        const usuario = await usuarioRepository.buscarPorId();
+        return usuarios || [];
+    } catch (error) {
+        console.error("Erro no serviço ao lista usuários:", error);
+        throw new Error('Ocorreu um erro no servidor ao buscar a lista de usuários.');
+    }
+};
 
-        if(usuario) {
-            return usuario;
-        }else{
-            throw {id: 404, msg: "Usuário não encontrado."}
+/**
+ * Cria um novo usuário no sistema.
+ * Valida os dados, verifica a existência do email e criptografa a senha antes de salvar.
+ * @param {object} dadosUsuario - Objeto contendo os dados do novo usuário { nome, email, senha, tipo, ... }.
+ * @returns {Promise<object>} Retorna o objeto do usuário recém-criado (sem a senha).
+ * @throws {ApiError} Lança um erro se os dados forem inválidos, o email já existir, ou outra falha ocorrer.
+ */
+async function criar(dadosUsuario) {
+    const {nome, email, senha, tipo} = dadosUsuario;
+
+    if (!nome || !email || !senha ) {
+        throw new ApiError(400, "Nome, e-mail e senha são campos obrigatórios.");
+    }
+
+    try {
+        const usuarioExistente = await usuarioRepository.buscarPorEmail(email);
+        if (usuarioExistente) {
+            throw new ApiError(409, "O e-mail fornecido já está cadastrado.");
         }
 
-    } catch(error) {
-        console.error('SERVICE ERROR:', error);
-        throw new Error(`Erro na camada de serviço: ${error.message}`);
-    }
-}
+        const senhaHash = await bcrypt.hash(senha, 10);
 
-async function listarUsuarios() {
-    try {
-        console.log('SERVICE: Chamando o repositório para listar usuários...');
-        const usuarios = await usuarioRepository.listar();
-        return usuarios;
+        const novoUsuarioParaSalvar = {
+            nome,
+            email, 
+            senha: senhaHash,
+            tipo: tipo || 'aluno'
+        };
+
+        const usuarioCriado = await usuarioRepository.criar(novoUsuarioParaSalvar);
+        delete usuarioCriado.senha;
+
+        return usuarioCriado;
+
+    }catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+
+        if (error.code === 'ER_DUP_ENTRY') {
+            throw new ApiError(409, 'O e-mail fornecido já está cadastrado.');
+        }
+
+        console.error("Erro no serviço ao criar usuário: ", error);
+        throw new Error('Ocorreu uma falha no servidor ao tentar criar o usuário.');
+    }
+};
+
+async function buscarPorId(id) {
+    try{
+        const usuario = await usuarioRepository.buscarPorId(id);
+
+        if(!usuario) {
+            throw new ApiError(404, "Usuário não encontrado.");
+        }
+
+        return usuario
     } catch (error) {
-        // Log do erro original completo no console para depuração
-        console.error('ERRO DETALHADO NO SERVICE:', error); 
-        
-        // CORREÇÃO: Crie uma nova mensagem de erro que inclua a mensagem do erro original
-        throw new Error(`Erro na camada de serviço: ${error.message}`);
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        console.error(`Erro no serviço ao buscar usuário por ID ${id}: `, error);
+        throw new Error('Ocorreu um erro no servidor ao processar sua solicitação.');
+    }
+};
+
+async function buscarPorEmail(email) {
+    try {
+        const usuario = await usuarioRepository.buscarPorEmail(email);
+
+        if (!usuario) {
+            throw new ApiError(404, "Usuário não encontrado.");
+        }
+        return usuario;
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        console.error(`Erro no serviço ao buscar usuário pelo e-mail ${email}: `, error);
+        throw new Error('Ocorreu um erro no servidor ao processar sua solicitação.');
     }
 }
 
-async function criarUsuario(usuario) {
+async function buscarPorGoogleId(id) {
+    try{
+        const usuario = await usuarioRepository.buscarPorId(id);
+
+        if(!usuario) {
+            throw new ApiError(404, "Usuário não encontrado.");
+        }
+
+        return usuario
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        console.error(`Erro no serviço ao buscar usuário por ID ${id}: `, error);
+        throw new Error('Ocorreu um erro no servidor ao processar sua solicitação.');
+    }
+};
+
+async function atualizar(id, dados) {
     try {
         console.log('Oi');
     }catch (error) {
@@ -39,7 +122,38 @@ async function criarUsuario(usuario) {
     }
 };
 
+/**
+ * Remove um usuário do sistema.
+ * Verifica primeiro se o usuário existe antes de tentar a remoção.
+ * @param {number} id - O ID do usuário a ser removido.
+ * @returns {Promise<void>} Retorna uma promessa vazia em caso de sucesso.
+ * @throws {ApiError} Lança um erro se o usuário não for encontrado ou se ocorrer uma falha.
+ */
+async function remover(id) {
+    try {
+        const usuario = await usuarioRepository.buscarPorId(id);
+
+        if (!usuario) {
+            throw new ApiError(404, "Usuário não encontrado. Nenhum registro foi removido.")
+        }
+
+        await usuarioRepository.remover(id);
+
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        console.error(`Erro no serviço ao remover usuário ID ${id}:`, error);
+        throw new Error('Ocorreu uma falha no servidor ao tentar remover o usuário.');
+    }
+};
+
 module.exports = {
+    listar,
+    criar,
     buscarPorId,
-    listarUsuarios
+    buscarPorEmail,
+    buscarPorGoogleId,
+    atualizar,
+    remover
 };

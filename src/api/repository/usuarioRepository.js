@@ -1,74 +1,108 @@
-// Removida a importação duplicada e não utilizada de 'db'
 const pool = require('../../config/database');
 
 /**
- * Cria um novo usuário no banco de dados.
- */
-async function criar(usuario) {
-    // CORREÇÃO: Removido o campo 'curso' da query, pois ele não está na lista de colunas.
-    // Isso resolve o erro 'Column count doesn't match value count'.
-    const { nome, email, googleId, tipo } = usuario;
-    const sql = 'INSERT INTO Usuario (nome, email, googleId, tipo) VALUES (?, ?, ?, ?)';
-    
-    try {
-        console.log('REPOSITÓRIO: Executando a query SQL de criação...');
-        // CORREÇÃO: Passando apenas os valores que correspondem às colunas na query SQL.
-        const [result] = await pool.execute(sql, [nome, email, googleId, tipo]);
-        
-        // Retorna o objeto do usuário recém-criado com o ID.
-        return { id: result.insertId, nome, email, googleId, tipo };
-    } catch (error) {
-        console.error('Erro no repositório ao criar usuário: ', error);
-        throw error;
-    }
-}
-
-/**
- * Busca um usuário pelo seu ID.
- */
-async function buscarPorId(id) { // CORREÇÃO: Adicionado o parâmetro 'id' que estava faltando.
-    const sql = 'SELECT * FROM Usuario WHERE id = ?';
-    try {
-        const [rows] = await pool.execute(sql, [id]);
-        return rows[0];
-    } catch (error) {
-        console.error('ERRO NO REPOSITÓRIO ao buscar por ID: ', error);
-        throw error;
-    }
-}
-
-/**
- * Lista todos os usuários.
+ * Busca todos os usuários no banco de dados, ordenados por nome.
+ * @returns {Promise<Array>} Uma promessa que resolve para um array de usuários.
  */
 async function listar() {
     const sql = 'SELECT id, nome, email, tipo FROM Usuario ORDER BY nome ASC';
     
-    try {
-        const [rows] = await pool.execute(sql);
-        return rows;
-    } catch (error) {
-        console.error('ERRO NO REPOSITÓRIO ao listar usuários: ', error.message); 
-        throw error;
+    const [rows] = await pool.execute(sql);
+    return rows;
+};
+
+/**
+ * Insere um novo usuário no banco de dados.
+ * @param {object} usuario - O objeto do usuário contendo { nome, email, googleId, tipo }.
+ * @returns {Promise<object>} Uma promessa que resolve para o objeto do novo usuário criado, incluindo seu ID.
+ */
+async function criar(usuario) {
+    const { nome, email, googleId, tipo } = usuario;
+    const sql = 'INSERT INTO Usuario (nome, email, googleId, tipo) VALUES (?, ?, ?, ?)';
+    
+    const [result] = await pool.execute(sql, [nome, email, googleId, tipo]);
+    return { id: result.insertId, ...usuario };
+};
+
+/**
+ * Busca um usuário específico pelo seu ID.
+ * @param {number} id - O ID do usuário a ser buscado.
+ * @returns {Promise<object|undefined>} Uma promessa que resolve para o objeto do usuário ou undefined se não for encontrado.
+ */
+async function buscarPorId(id) {
+    const sql = 'SELECT * FROM Usuario WHERE id = ?';
+    const [rows] = await pool.execute(sql, [id]);
+
+    return rows[0];
+};
+
+async function buscarPorEmail(email) {
+    const sql = 'SELECT * FROM Usuario WHERE email = ?';
+    const [result] = await pool.execute(sql, [email]);
+
+    return result;
+}
+
+async function buscarPorGoogleId(googleId) {
+    const sql = 'SELECT * FROM Usuario WHERE googleId = ?';
+
+    const [rows] = await pool.execute(sql, [googleId]);
+    return rows[0];
+};
+
+/**
+ * Atualiza os dados de um usuário no banco de dados.
+ * A função constrói a query dinamicamente para atualizar apenas os campos fornecidos.
+ * @param {number} id - O ID do usuário a ser atualizado.
+ * @param {object} dadosParaAtualizar - Um objeto contendo os campos a serem atualizados. Ex: { nome: "Novo Nome", tipo: "monitor" }.
+ * @returns {Promise<object>} Uma promessa que resolve para o objeto de resultado da query.
+ */
+async function atualizar(id, dadosParaAtualizar) {
+    const camposPermitidos = {
+        nome: dadosParaAtualizar.nome,
+        email: dadosParaAtualizar.email,
+        tipo: dadosParaAtualizar.tipo
+    };
+
+    const camposParaQuery = [];
+    const valoresParaQuery = [];
+
+    for (const campo in camposPermitidos) {
+        if (camposPermitidos[campo] !== undefined) {
+            camposParaQuery.push(`${campo} = ?`);
+            valoresParaQuery.push(camposPermitidos[campo]);
+        }
     }
+
+    if (valoresParaQuery.length === 0) {
+        return { changedRows: 0 };
+    }
+    
+    valoresParaQuery.push(id);
+    const sql = `UPDATE Usuario SET ${camposParaQuery.join(', ')} WHERE id = ?`;
+    
+    const [result] = await pool.execute(sql, valoresParaQuery);
+    return result;
 }
 
 /**
- * Busca um usuário pelo seu googleId.
+ * Remove um usuário do banco de dados pelo seu ID.
+ * @param {number} id - O ID do usuário a ser removido.
+ * @returns {Promise<object>} Uma promessa que resolve para o objeto de resultado da query.
  */
-async function buscarPorGoogleId(googleId) {
-    const sql = 'SELECT * FROM Usuario WHERE googleId = ?';
-    try {
-        const [rows] = await pool.execute(sql, [googleId]);
-        return rows[0];
-    } catch (error) {
-        console.error('ERRO NO REPOSITÓRIO ao buscar por Google ID: ', error);
-        throw error;
-    }
+async function remover(id) {
+    const sql = 'DELETE FROM Usuario WHERE id = ?';
+
+    const [result] = await pool.execute(sql, [id]);
+    return result;
 }
 
 module.exports = {
     listar,
     criar,
     buscarPorId,
-    buscarPorGoogleId
+    buscarPorEmail,
+    buscarPorGoogleId,
+    atualizar,
+    remover
 };

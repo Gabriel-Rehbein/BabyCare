@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/jaroslank/monitoria-api#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
