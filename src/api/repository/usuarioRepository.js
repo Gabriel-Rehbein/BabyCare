@@ -30,7 +30,7 @@ async function criar(usuario) {
  * @returns {Promise<object|undefined>} Uma promessa que resolve para o objeto do usuário ou undefined se não for encontrado.
  */
 async function buscarPorId(id) {
-    const sql = 'SELECT * FROM Usuario WHERE id = ?';
+    const sql = 'SELECT id, nome, email, googleId, tipo FROM Usuario WHERE id = ?';
     const [rows] = await pool.execute(sql, [id]);
 
     return rows[0];
@@ -62,19 +62,18 @@ async function buscarPorGoogleId(googleId) {
  * @returns {Promise<object>} Uma promessa que resolve para o objeto de resultado da query.
  */
 async function atualizar(id, dadosParaAtualizar) {
-    const camposPermitidos = {
-        nome: dadosParaAtualizar.nome,
-        email: dadosParaAtualizar.email,
-        tipo: dadosParaAtualizar.tipo
-    };
+    if (!Number.isInteger(id)) {
+        throw new Error("ID inválido");
+    }
 
+    const camposValidos = ['nome', 'email', 'tipo'];
     const camposParaQuery = [];
     const valoresParaQuery = [];
 
-    for (const campo in camposPermitidos) {
-        if (camposPermitidos[campo] !== undefined) {
-            camposParaQuery.push(`${campo} = ?`);
-            valoresParaQuery.push(camposPermitidos[campo]);
+    for (const chave of camposValidos) {
+        if (dadosParaAtualizar[chave] !== undefined) {
+            camposParaQuery.push(`${chave} = ?`);
+            valoresParaQuery.push(dadosParaAtualizar[chave]);
         }
     }
 

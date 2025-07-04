@@ -11,7 +11,7 @@ require('dotenv').config();
 require('./src/config/passport-setup');
 
 app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'], // Adicione a URL do seu Live Server
+  origin: ['http://localhost:3001', 'http://127.0.0.1:3001'], // Adicione a URL do seu Live Server
   credentials: true
 }));
 
@@ -41,7 +41,7 @@ app.use('/auth', authRoutes);
 
 app.use((err, req, res, next) => {
     console.error("ERRO GLOBAL:", err);
-
+    
     if (err instanceof ApiError) {
         return res.status(err.statusCode).json({ message: err.message });
     }

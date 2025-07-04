@@ -12,7 +12,7 @@ const listarUsuarios = async (req, res, next) => {
 
 const criarUsuario = async (req, res, next) => {
     try {
-
+        
     } catch (error) {
 
     }
@@ -40,10 +40,13 @@ const buscarUsuarioPorEmail = async (req, res, next) => {
 };
 
 const buscarUsuarioPorGoogleId = async (req, res, next) => {
+    const {googleId} = req.params;
+
     try {
-
+        const usuario = await usuarioService.buscarPorGoogleId(googleId);
+        res.status(200).json(usuario);
     } catch (error) {
-
+        next(error);
     }
 };
 
