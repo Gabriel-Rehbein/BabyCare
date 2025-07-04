@@ -36,12 +36,16 @@ async function buscarPorId(id) {
     return rows[0];
 };
 
+/**
+ * Busca um usuário específico pelo seu email.
+ * @param {string} email - O email do usuário a ser buscado.
+ * @returns {Promise<object|undefined>} Uma promessa que resolve para o objeto do usuário ou undefined se não for encontrado.
+ */
 async function buscarPorEmail(email) {
-    const sql = 'SELECT * FROM Usuario WHERE email = ?';
-    const [result] = await pool.execute(sql, [email]);
-
-    return result;
-}
+    const sql = 'SELECT id, nome, email, googleId, tipo FROM Usuario WHERE email = ?';
+    const [rows] = await pool.execute(sql, [email]);
+    return rows[0];
+};
 
 async function buscarPorGoogleId(googleId) {
     const sql = 'SELECT * FROM Usuario WHERE googleId = ?';

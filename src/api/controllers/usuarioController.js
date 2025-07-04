@@ -2,7 +2,7 @@ const usuarioService = require('../services/usuarioService');
 
 const listarUsuarios = async (req, res, next) => {
     try {
-        const usuarios = await usuarioService.listarUsuarios();
+        const usuarios = await usuarioService.listar();
         res.status(200).json(usuarios);
 
     } catch(error) {
@@ -29,8 +29,9 @@ const buscarUsuarioPorId = async (req, res, next) => {
 };
 
 const buscarUsuarioPorEmail = async (req, res, next) => {
+    const {email} = req.params;
+    
     try {
-        const {email} = req.params;
         const usuario = await usuarioService.buscarPorEmail(email);
         res.status(200).json(usuario);
     } catch(error) {
