@@ -114,38 +114,46 @@ async function buscarPorGoogleId(id) {
     }
 };
 
-async function atualizar(id, dados) {
-    try {
-        console.log('Oi');
-    }catch (error) {
-        
+async function atualizar(id, dadosAtualizados) {
+    const numericId = Number(id);
+    if (!numericId || !Number.isInteger(numericId) || numericId <= 0) {
+        throw new ApiError(404, "O ID do usuário fornecido é inválido.");
     }
+
+    const usuarioExistente = await usuarioRepository.buscarPorId(id);
+    if(!usuarioExistente) {
+        throw new Error('Usuário não encontrado.');
+    }
+
+    const dadosParaAtualizar = dadosAtualizados;
+    if (Object.keys(dadosParaAtualizar.length === 0)) {
+        throw new ApiError(400, 'Nenhum dado fornecido para atualização.');
+    }
+
+    const usuarioAtualizado = await usuarioRepository.atualizar(idNumerico, dadosParaAtualizar);
+
+    return usuarioAtualizado;
 };
 
 /**
  * Remove um usuário do sistema.
- * Verifica primeiro se o usuário existe antes de tentar a remoção.
  * @param {number} id - O ID do usuário a ser removido.
  * @returns {Promise<void>} Retorna uma promessa vazia em caso de sucesso.
  * @throws {ApiError} Lança um erro se o usuário não for encontrado ou se ocorrer uma falha.
  */
-async function remover(id) {
-    try {
-        const usuario = await usuarioRepository.buscarPorId(id);
+async function remover(id) { 
+    const idNumerico = Number(id);
 
-        if (!usuario) {
-            throw new ApiError(404, "Usuário não encontrado. Nenhum registro foi removido.")
-        }
-
-        await usuarioRepository.remover(id);
-
-    } catch (error) {
-        if (error instanceof ApiError) {
-            throw error;
-        }
-        console.error(`Erro no serviço ao remover usuário ID ${id}:`, error);
-        throw new Error('Ocorreu uma falha no servidor ao tentar remover o usuário.');
+    if(!idNumerico || !Number.isInteger(idNumerico) || idNumerico <= 0) {
+        throw new ApiError(400, "O ID do usuário fornecido é inválido.");
     }
+    const usuario = await usuarioRepository.buscarPorId(id);
+
+    if(!usuario) {
+        throw new ApiError(404, "Usuário não encontrado.");
+    }
+
+    await usuarioRepository.remover(id);
 };
 
 module.exports = {

@@ -6,15 +6,17 @@ const listarUsuarios = async (req, res, next) => {
         res.status(200).json(usuarios);
 
     } catch(error) {
-        res.status(500).json({message: "Ocorreu um erro ao buscar os usuários.", error: error.message});
+        next(error);
     }
 };
 
 const criarUsuario = async (req, res, next) => {
     try {
-        
+        const {dados} = req.params;
+        await usuarioService.criar(dados);
+        res.status(200).json({message: `Criado usuário${dados}`});
     } catch (error) {
-
+        next(error);
     }
 };
 
@@ -52,9 +54,18 @@ const buscarUsuarioPorGoogleId = async (req, res, next) => {
 
 const atualizarUsuario = async (req, res, next) => {
     try {
+        const {id} = req.params;
+        const dadosAtualizados = req.body;
 
+        if(!id) {
+            return res.status(400).json({ message: 'ID do usuário é obrigatório.' });
+        }
+
+        const usuarioAtualizado = await usuarioService.atualizar(Number(id), dadosAtualizados);
+
+        res.status(200).json(usuarioAtualizado);
     } catch (error) {
-
+        next(error);
     }
 };
 

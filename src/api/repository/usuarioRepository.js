@@ -1,4 +1,5 @@
 const pool = require('../../config/database');
+const ApiError = require('../../utils/ApiError');
 
 /**
  * Busca todos os usuários no banco de dados, ordenados por nome.
@@ -48,8 +49,7 @@ async function buscarPorEmail(email) {
 };
 
 async function buscarPorGoogleId(googleId) {
-    const sql = 'SELECT * FROM Usuario WHERE googleId = ?';
-
+    const sql = 'SELECT id, nome, email, googleId, tipo FROM Usuario WHERE googleId = ?';
     const [rows] = await pool.execute(sql, [googleId]);
     return rows[0];
 };
@@ -59,45 +59,50 @@ async function buscarPorGoogleId(googleId) {
  * A função constrói a query dinamicamente para atualizar apenas os campos fornecidos.
  * @param {number} id - O ID do usuário a ser atualizado.
  * @param {object} dadosParaAtualizar - Um objeto contendo os campos a serem atualizados. Ex: { nome: "Novo Nome", tipo: "monitor" }.
- * @returns {Promise<object>} Uma promessa que resolve para o objeto de resultado da query.
+ * @returns {Promise<object|null>} Uma promessa que resolve para o objeto de resultado da query.
  */
 async function atualizar(id, dadosParaAtualizar) {
-    if (!Number.isInteger(id)) {
-        throw new Error("ID inválido");
+    if (!id || !Number.isInteger(id) || id <= 0) {
+        throw new Error("ID de usuário fornecido ao repositório é inválido!");
     }
 
-    const camposValidos = ['nome', 'email', 'tipo'];
+    const camposPermitidos = ['nome', 'curso', 'semestre', 'tipo'];
     const camposParaQuery = [];
     const valoresParaQuery = [];
 
-    for (const chave of camposValidos) {
+    camposPermitidos.forEach(chave => {
         if (dadosParaAtualizar[chave] !== undefined) {
             camposParaQuery.push(`${chave} = ?`);
             valoresParaQuery.push(dadosParaAtualizar[chave]);
         }
+    });
+
+    if (camposParaQuery.length === 0) {
+        return await buscarPorId(id);
     }
 
-    if (valoresParaQuery.length === 0) {
-        return { changedRows: 0 };
-    }
-    
-    valoresParaQuery.push(id);
     const sql = `UPDATE Usuario SET ${camposParaQuery.join(', ')} WHERE id = ?`;
-    
+    valoresParaQuery.push(id);
+
     const [result] = await pool.execute(sql, valoresParaQuery);
-    return result;
+
+    if (result.affectedRows === 0) {
+        return null;
+    }
+
+    return await buscarPorId(id);
 }
 
 /**
  * Remove um usuário do banco de dados pelo seu ID.
  * @param {number} id - O ID do usuário a ser removido.
- * @returns {Promise<object>} Uma promessa que resolve para o objeto de resultado da query.
- */
+ * @returns {Promise<number>} Uma promessa que resolve para o objeto de resultado da query.
+*/
 async function remover(id) {
     const sql = 'DELETE FROM Usuario WHERE id = ?';
-
     const [result] = await pool.execute(sql, [id]);
-    return result;
+
+    return result.affectedRows;
 }
 
 module.exports = {

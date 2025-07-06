@@ -4,9 +4,10 @@ const router = express.Router();
 const usuarioController = require('../controllers/usuarioController');
 
 router.get('/', isLoggedIn, usuarioController.listarUsuarios);
+router.post('/', isLoggedIn, usuarioController.criarUsuario);
 router.get('/:id', isLoggedIn, usuarioController.buscarUsuarioPorId);
-router.put('/:id', isLoggedIn, usuarioController.atualizarUsuario);
+router.patch('/:id', isLoggedIn, usuarioController.atualizarUsuario);
 router.get('/email/:email', isLoggedIn, usuarioController.buscarUsuarioPorEmail);
-router.delete('/remove/:id', isLoggedIn, usuarioController.removerUsuario);
+router.delete('/:id', isLoggedIn, usuarioController.removerUsuario);
 
 module.exports = router;
