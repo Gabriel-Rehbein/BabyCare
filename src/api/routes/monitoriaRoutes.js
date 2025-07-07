@@ -11,4 +11,7 @@ const router = Router();
 // GET / -> Listar todas as monitorias ativas
 router.get('/', isLoggedIn, monitoriaController.listarTodas);
 
+//GET / -> Buscar uma monitoria por ID.
+router.get('/:id', isLoggedIn, monitoriaController.buscarUma);
+
 export default router;

@@ -11,6 +11,17 @@ const listarTodas = async (req, res, next) => {
     }
 };
 
+const buscarUma = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const monitoria = await monitoriaService.buscarPorId(id);
+        res.status(200).json(monitoria);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export {
-    listarTodas
+    listarTodas,
+    buscarUma
 };
