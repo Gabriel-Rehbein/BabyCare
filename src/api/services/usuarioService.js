@@ -53,9 +53,25 @@ async function deletar(id) {
     return;
 }
 
+async function reativar(id) {
+    const idNumerico = Number(id);
+    if (!idNumerico || !Number.isInteger(idNumerico)) {
+        throw new ApiError(400, 'ID de usuário inválido.');
+    }
+
+    const sucesso = await usuarioRepository.reativar(idNumerico);
+    if (!sucesso) {
+        throw new ApiError(404, 'Usuário não encontrado para reativar.');
+    }
+    
+    // Retorna o usuário completo após a reativação
+    return await usuarioRepository.buscarPorId(idNumerico);
+}
+
 export {
     listar,
     buscarPorId,
     atualizar,
-    deletar
+    deletar,
+    reativar
 };

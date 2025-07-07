@@ -52,10 +52,21 @@ const deletarUm = async (req, res, next) => {
     }
 };
 
+const reativarUm = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const usuarioReativado = await usuarioService.reativar(id);
+        res.status(200).json(usuarioReativado);
+    } catch (error) {
+        next(error);
+    }
+};
+
 // Exporta todas as funções do controller
 export {
     listarTodos,
     buscarUm,
     atualizarUm,
-    deletarUm
+    deletarUm,
+    reativarUm
 };

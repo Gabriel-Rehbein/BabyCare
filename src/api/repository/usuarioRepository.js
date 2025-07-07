@@ -49,6 +49,12 @@ async function desativar(id) {
     return result.affectedRows > 0;
 }
 
+async function reativar(id) {
+    const sql = `UPDATE Usuario SET ativo = TRUE WHERE id = ?`;
+    const [result] = await pool.execute(sql, [id]);
+    return result.affectedRows > 0;
+}
+
 // Funções de autenticação
 async function buscarPorGoogleId(googleId) {
     const [rows] = await pool.execute('SELECT * FROM Usuario WHERE googleId = ?', [googleId]);
@@ -68,6 +74,7 @@ export {
     buscarPorId,
     atualizar,
     desativar,
+    reativar,
     buscarPorGoogleId,
     criar
 };

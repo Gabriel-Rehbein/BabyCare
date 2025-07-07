@@ -11,6 +11,7 @@ import './src/config/passport-setup.js'; // Apenas executa o arquivo de configur
 
 // Rotas
 import usuarioRoutes from './src/api/routes/usuarioRoutes.js';
+import monitoriaRoutes from './src/api/routes/monitoriaRoutes.js';
 import authRoutes from './src/api/routes/authRoutes.js';
 
 const app = express();
@@ -43,12 +44,25 @@ app.use(passport.session());
 
 // Rotas da Aplicação
 app.get('/', (req, res) => {
-    res.status(200).json({ message: 'API de Monitoria Acadêmica no ar!' });
+    const htmlResponse = `
+        <div style="font-family: sans-serif; text-align: center; padding-top: 50px; color: #333;">
+            <h1>API de Monitoria Acadêmica</h1>
+            <p>A API está no ar e funcionando.</p>
+            <p>Para iniciar o processo de autenticação, clique no link abaixo:</p>
+            <a 
+                href="http://localhost:3000/auth/google" 
+                style="display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #4285F4; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
+            >
+                Login com Google
+            </a>
+        </div>
+    `;
+    res.status(200).send(htmlResponse);
 });
 
 app.use('/auth', authRoutes);
 app.use('/usuarios', usuarioRoutes);
-
+app.use('/monitorias', monitoriaRoutes);
 // Middleware de Tratamento de Erros
 app.use((err, req, res, next) => {
     console.error("ERRO GLOBAL:", err);

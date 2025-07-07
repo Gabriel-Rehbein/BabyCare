@@ -30,4 +30,7 @@ router.patch('/:id', isLoggedIn, regrasDeAtualizacao, usuarioController.atualiza
 // DELETE /:id -> Desativar um usuário (soft delete)
 router.delete('/:id', isLoggedIn, usuarioController.deletarUm);
 
+//PATCH /:id/reativar -> Reativa um usuário
+router.patch('/:id/reativar', isLoggedIn, usuarioController.reativarUm);
+
 export default router;
