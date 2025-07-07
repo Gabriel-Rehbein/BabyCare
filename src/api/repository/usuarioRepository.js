@@ -1,72 +1,21 @@
-const pool = require('../../config/database');
-const ApiError = require('../../utils/ApiError');
+import pool from '../../config/database.js';
 
-/**
- * Busca todos os usuários no banco de dados, ordenados por nome.
- * @returns {Promise<Array>} Uma promessa que resolve para um array de usuários.
- */
-async function listar() {
-    const sql = 'SELECT id, nome, email, tipo FROM Usuario ORDER BY nome ASC';
-    
-    const [rows] = await pool.execute(sql);
-    return rows;
-};
-
-/**
- * Insere um novo usuário no banco de dados.
- * @param {object} usuario - O objeto do usuário contendo { nome, email, googleId, tipo }.
- * @returns {Promise<object>} Uma promessa que resolve para o objeto do novo usuário criado, incluindo seu ID.
- */
-async function criar(usuario) {
-    const { nome, email, googleId, tipo } = usuario;
-    const sql = 'INSERT INTO Usuario (nome, email, googleId, tipo) VALUES (?, ?, ?, ?)';
-    
-    const [result] = await pool.execute(sql, [nome, email, googleId, tipo]);
-    return { id: result.insertId, ...usuario };
-};
-
-/**
- * Busca um usuário específico pelo seu ID.
- * @param {number} id - O ID do usuário a ser buscado.
- * @returns {Promise<object|undefined>} Uma promessa que resolve para o objeto do usuário ou undefined se não for encontrado.
- */
+// Helper para reutilizar a busca
 async function buscarPorId(id) {
-    const sql = 'SELECT id, nome, email, googleId, tipo FROM Usuario WHERE id = ?';
-    const [rows] = await pool.execute(sql, [id]);
+    if (!id || !Number.isInteger(Number(id))) return null;
+    // Seleciona todas as colunas da nova tabela
+    const [linhas] = await pool.query('SELECT id, googleId, nome, email, curso, semestre, tipo, ativo, criado_em, atualizado_em FROM Usuario WHERE id = ?', [id]);
+    return linhas[0] || null;
+}
 
-    return rows[0];
-};
+async function listar() {
+    // Retorna apenas usuários ativos e um conjunto limitado de colunas para a listagem geral
+    const [linhas] = await pool.query('SELECT id, googleId, nome, email, curso, semestre, tipo, ativo, criado_em, atualizado_em FROM Usuario WHERE ativo = TRUE');
+    return linhas;
+}
 
-/**
- * Busca um usuário específico pelo seu email.
- * @param {string} email - O email do usuário a ser buscado.
- * @returns {Promise<object|undefined>} Uma promessa que resolve para o objeto do usuário ou undefined se não for encontrado.
- */
-async function buscarPorEmail(email) {
-    const sql = 'SELECT id, nome, email, googleId, tipo FROM Usuario WHERE email = ?';
-    const [rows] = await pool.execute(sql, [email]);
-    return rows[0];
-};
-
-async function buscarPorGoogleId(googleId) {
-    const sql = 'SELECT id, nome, email, googleId, tipo FROM Usuario WHERE googleId = ?';
-    const [rows] = await pool.execute(sql, [googleId]);
-    return rows[0];
-};
-
-/**
- * Atualiza os dados de um usuário no banco de dados.
- * A função constrói a query dinamicamente para atualizar apenas os campos fornecidos.
- * @param {number} id - O ID do usuário a ser atualizado.
- * @param {object} dadosParaAtualizar - Um objeto contendo os campos a serem atualizados. Ex: { nome: "Novo Nome", tipo: "monitor" }.
- * @returns {Promise<object|null>} Uma promessa que resolve para o objeto de resultado da query.
- */
 async function atualizar(id, dadosParaAtualizar) {
-    if (!id || !Number.isInteger(id) || id <= 0) {
-        throw new Error("ID de usuário fornecido ao repositório é inválido!");
-    }
-
-    const camposPermitidos = ['nome', 'curso', 'semestre', 'tipo'];
+    const camposPermitidos = ['nome', 'curso', 'semestre']; // Apenas campos que o usuário pode mudar
     const camposParaQuery = [];
     const valoresParaQuery = [];
 
@@ -93,24 +42,32 @@ async function atualizar(id, dadosParaAtualizar) {
     return await buscarPorId(id);
 }
 
-/**
- * Remove um usuário do banco de dados pelo seu ID.
- * @param {number} id - O ID do usuário a ser removido.
- * @returns {Promise<number>} Uma promessa que resolve para o objeto de resultado da query.
-*/
-async function remover(id) {
-    const sql = 'DELETE FROM Usuario WHERE id = ?';
+// Função de desativação (soft delete)
+async function desativar(id) {
+    const sql = `UPDATE Usuario SET ativo = FALSE WHERE id = ?`;
     const [result] = await pool.execute(sql, [id]);
-
-    return result.affectedRows;
+    return result.affectedRows > 0;
 }
 
-module.exports = {
+// Funções de autenticação
+async function buscarPorGoogleId(googleId) {
+    const [rows] = await pool.execute('SELECT * FROM Usuario WHERE googleId = ?', [googleId]);
+    return rows[0];
+}
+
+async function criar(usuario) {
+    const { nome, email, googleId } = usuario;
+    // O banco de dados cuidará dos valores padrão para 'tipo', 'ativo', 'criado_em', 'atualizado_em'
+    const sql = 'INSERT INTO Usuario (nome, email, googleId) VALUES (?, ?, ?)';
+    const [result] = await pool.execute(sql, [nome, email, googleId]);
+    return await buscarPorId(result.insertId);
+}
+
+export {
     listar,
-    criar,
     buscarPorId,
-    buscarPorEmail,
-    buscarPorGoogleId,
     atualizar,
-    remover
+    desativar,
+    buscarPorGoogleId,
+    criar
 };

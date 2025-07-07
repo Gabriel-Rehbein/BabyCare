@@ -1,12 +1,13 @@
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const usuarioRepository = require('../api/repository/usuarioRepository');
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import * as usuarioRepository from '../api/repository/usuarioRepository.js';
 
 // Salva o ID do usuário na sessão
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
+// Busca o usuário completo a partir do ID salvo na sessão
 passport.deserializeUser(async (id, done) => {
     try {
         const user = await usuarioRepository.buscarPorId(id);
@@ -40,9 +41,7 @@ passport.use(
                     googleId: profile.id,
                     nome: profile.displayName,
                     email: profile.emails[0].value,
-                    // Defina valores padrão para outros campos se necessário
-                    tipo: 'aluno', 
-                    curso: null
+                    // O banco de dados cuidará dos valores padrão para 'tipo', 'ativo', etc.
                 };
                 usuario = await usuarioRepository.criar(novoUsuario);
                 console.log('Novo usuário criado:', usuario);

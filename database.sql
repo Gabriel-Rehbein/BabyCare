@@ -78,24 +78,6 @@ CREATE TABLE IF NOT EXISTS `Agendamento` (
     -- A constraint CHECK foi removida daqui. A validação (data_hora_fim > data_hora_inicio) deve ser feita na aplicação.
 ) ENGINE=InnoDB;
 
--- =============================================================================
--- Tabela: Avaliacao
--- =============================================================================
-CREATE TABLE IF NOT EXISTS `Avaliacao` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `agendamento_id` INT NOT NULL UNIQUE COMMENT 'Garante uma única avaliação por agendamento.',
-    `avaliador_id` INT NULL COMMENT 'O aluno que fez a avaliação. Nulo se o usuário for deletado.',
-    `avaliado_id` INT NULL COMMENT 'O monitor que foi avaliado. Nulo se o usuário for deletado.',
-    `nota` TINYINT UNSIGNED NOT NULL COMMENT 'Nota de 1 a 5.',
-    `comentario` TEXT NULL,
-    `criado_em` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (`agendamento_id`) REFERENCES `Agendamento`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`avaliador_id`) REFERENCES `Usuario`(`id`) ON DELETE SET NULL,
-    FOREIGN KEY (`avaliado_id`) REFERENCES `Usuario`(`id`) ON DELETE SET NULL
-    -- A constraint CHECK foi removida daqui. A validação (nota entre 1 e 5) deve ser feita na aplicação.
-) ENGINE=InnoDB;
-
 
 -- =============================================================================
 --                                  ÍNDICES
@@ -106,8 +88,6 @@ CREATE INDEX `idx_monitoria_monitor_id` ON `Monitoria`(`monitor_id`);
 CREATE INDEX `idx_agendamento_monitoria_id` ON `Agendamento`(`monitoria_id`);
 CREATE INDEX `idx_agendamento_aluno_id` ON `Agendamento`(`aluno_id`);
 CREATE INDEX `idx_agendamento_data_inicio` ON `Agendamento`(`data_hora_inicio`);
-CREATE INDEX `idx_avaliacao_avaliador_id` ON `Avaliacao`(`avaliador_id`);
-CREATE INDEX `idx_avaliacao_avaliado_id` ON `Avaliacao`(`avaliado_id`);
 
 -- =============================================================================
 --                                FIM DO SCRIPT

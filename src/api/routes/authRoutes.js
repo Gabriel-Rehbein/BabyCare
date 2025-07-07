@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const passport = require('passport');
+import { Router } from 'express';
+import passport from 'passport';
+
+const router = Router();
 
 router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email']
@@ -19,5 +20,4 @@ router.get('/logout', (req, res, next) => {
         res.redirect('http://localhost:3001/login.html');
     });
 });
-
-module.exports = router;
+export default router;
