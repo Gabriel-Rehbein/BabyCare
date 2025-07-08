@@ -48,7 +48,9 @@ router.get('/:id', isLoggedIn, validaId, agendamentoController.buscarUm);
 router.patch('/:id', isLoggedIn, validaId, regrasDeAtualizacao, agendamentoController.atualizarUm);
 
 // DELETE /agendamentos/:id -> Excluir um agendamento
-router.delete('/:id', isLoggedIn, validaId, agendamentoController.deletarUm);
+router.delete('/:id', isLoggedIn, validaId, agendamentoController.desativarUm);
 
+//PATCH /:id/reativar -> Reativa uma monitoria.
+router.patch('/:id/reativar', isLoggedIn, validaId, agendamentoController.reativarUm);
 
 export default router;

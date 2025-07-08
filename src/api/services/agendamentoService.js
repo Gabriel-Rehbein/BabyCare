@@ -1,5 +1,6 @@
 import * as agendamentoRepository from '../repository/agendamentoRepository.js';
 import * as monitoriaRepository from '../repository/monitoriaRepository.js';
+import pool from '../../config/database.js';
 import * as usuarioRepository from '../repository/usuarioRepository.js';
 import { ApiError } from '../../utils/ApiError.js';
 

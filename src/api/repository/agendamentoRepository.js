@@ -99,13 +99,13 @@ async function atualizar(id, dadosParaAtualizar) {
 
 // Função de desativação (soft delete)
 async function desativar(id) {
-    const sql = `UPDATE agendamento SET status = cancelado WHERE id = ?`;
+    const sql = `UPDATE agendamento SET status = 'cancelado' WHERE id = ?`;
     const [result] = await pool.execute(sql, [id]);
     return result.affectedRows > 0;
 }
 
 async function reativar(id) {
-    const sql = `UPDATE monitoria SET status = confirmado WHERE id = ?`;
+    const sql = `UPDATE monitoria SET status = 'confirmado' WHERE id = ?`;
     const [result] = await pool.execute(sql, [id]);
     return result.affectedRows > 0;
 }
