@@ -12,6 +12,8 @@ import './src/config/passport-setup.js'; // Apenas executa o arquivo de configur
 // Rotas
 import usuarioRoutes from './src/api/routes/usuarioRoutes.js';
 import monitoriaRoutes from './src/api/routes/monitoriaRoutes.js';
+import disciplinaRoutes from './src/api/routes/disciplinaRoutes.js';
+import agendamentoRoutes from './src/api/routes/agendamentoRoutes.js';
 import authRoutes from './src/api/routes/authRoutes.js';
 
 const app = express();
@@ -63,6 +65,8 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/usuarios', usuarioRoutes);
 app.use('/monitorias', monitoriaRoutes);
+app.use('/disciplinas', disciplinaRoutes);
+app.use('/agendamentos', agendamentoRoutes);
 // Middleware de Tratamento de Erros
 app.use((err, req, res, next) => {
     console.error("ERRO GLOBAL:", err);
