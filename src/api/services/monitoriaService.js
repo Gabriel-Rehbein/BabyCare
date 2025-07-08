@@ -1,5 +1,43 @@
 import * as monitoriaRepository from '../repository/monitoriaRepository.js';
+import * as disciplinaRepository from '../repository/disciplinaRepository.js';
+import * as usuarioRepository from '../repository/usuarioRepository.js';
 import { ApiError } from '../../utils/ApiError.js';
+
+/**
+ * Valida os dados e cria uma nova monitoria.
+ * @param {object} dadosMonitoria Os dados para a nova monitoria.
+ * @returns {Promise<object>} O objeto da monitoria recém-criada.
+ */
+async function criar(dadosMonitoria) {
+    const { disciplina_id, monitor_id, local } = dadosMonitoria;
+
+    // 1. Validação de campos obrigatórios
+    if (!disciplina_id || !monitor_id || !local) {
+        throw new ApiError(400, 'ID da disciplina, ID do monitor e local são obrigatórios.');
+    }
+
+    // 2. Valida se a disciplina existe
+    const disciplina = await disciplinaRepository.buscarPorId(disciplina_id);
+    if (!disciplina) {
+        throw new ApiError(404, 'A disciplina especificada não foi encontrada.');
+    }
+
+    // 3. Valida se o usuário (monitor) existe e está ativo
+    const monitor = await usuarioRepository.buscarPorId(monitor_id);
+    if (!monitor) {
+        throw new ApiError(404, 'O usuário especificado como monitor não foi encontrado.');
+    }
+    if (!monitor.ativo) {
+        throw new ApiError(403, 'O usuário especificado como monitor está inativo.');
+    }
+
+ if (monitor.tipo !== 'monitor') {
+     throw new ApiError(403, 'O usuário especificado não tem permissão para ser monitor.');
+ }
+    const novaMonitoria = await monitoriaRepository.criar(dadosMonitoria);
+
+    return novaMonitoria;
+}
 
 async function listar() {
     return await monitoriaRepository.listar();
@@ -75,6 +113,7 @@ async function reativar(id) {
 
 export {
     listar,
+    criar,
     buscarPorId,
     atualizar,
     deletar,

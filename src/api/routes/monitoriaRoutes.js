@@ -9,6 +9,13 @@ const validaId = [
     param('id').isInt({ min: 1 }).withMessage('O ID da monitoria deve ser um número inteiro positivo.')
 ];
 
+const regrasDeCriacao = [
+    body('disciplina_id').notEmpty().withMessage('O ID da disciplina é obrigatório.').isInt({ min: 1 }).withMessage('O ID da disciplina deve ser um número inteiro.'),
+    body('monitor_id').notEmpty().withMessage('O ID do monitor é obrigatório.').isInt({ min: 1 }).withMessage('O ID do monitor deve ser um número inteiro.'),
+    body('local').notEmpty().withMessage('O local é obrigatório.').isString().withMessage('O local deve ser um texto.').trim(),
+    body('horarios_disponiveis').optional().isObject().withMessage('Os horários disponíveis devem estar em formato JSON.')
+];
+
 const regrasDeAtualizacao = [
     body('horarios_disponiveis').optional().isJSON().withMessage('Os horários disponíveis devem estar em formato JSON.'),
     body('local').optional().isString().withMessage('O local deve ser um texto.').trim().notEmpty().withMessage('O local não pode ser vazio.'),
@@ -21,6 +28,9 @@ const regrasDeAtualizacao = [
 
 // GET / -> Listar todas as monitorias ativas.
 router.get('/', isLoggedIn, monitoriaController.listarTodas);
+
+// POST / -> Criar uma nova monitoria.
+router.post('/', isLoggedIn, regrasDeCriacao, monitoriaController.criarUma);
 
 //GET / -> Buscar uma monitoria pelo ID.
 router.get('/:id', isLoggedIn, monitoriaController.buscarUma);

@@ -1,5 +1,27 @@
 import pool from '../../config/database.js';
 
+/**
+ * Cria um novo registro de monitoria no banco de dados.
+ * @param {object} monitoria O objeto contendo os dados da nova monitoria.
+ * @returns {Promise<object>} O objeto da monitoria recém-criada.
+ */
+async function criar(monitoria) {
+    const { disciplina_id, monitor_id, horarios_disponiveis, local } = monitoria;
+
+    // Converte o objeto de horários para uma string JSON antes de inserir no banco.
+    const horariosJSON = horarios_disponiveis ? JSON.stringify(horarios_disponiveis) : null;
+
+    const sql = `
+        INSERT INTO Monitoria (disciplina_id, monitor_id, horarios_disponiveis, local) 
+        VALUES (?, ?, ?, ?)
+    `;
+    
+    const [result] = await pool.execute(sql, [disciplina_id, monitor_id, horariosJSON, local]);
+    
+    // Retorna o registro completo da monitoria que acabou de ser criada.
+    return await buscarPorId(result.insertId);
+}
+
 async function buscarPorId(id) {
     if (!id || !Number.isInteger(Number(id))) return null;
 
@@ -78,6 +100,7 @@ async function reativar(id) {
 
 export {
     listar,
+    criar,
     buscarPorId,
     atualizar,
     desativar,
