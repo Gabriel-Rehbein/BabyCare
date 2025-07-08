@@ -14,8 +14,5 @@ async function listar() {
 
 export {
     listar,
-    buscarPorId,
-    atualizar,
-    excluir,
-    criar
+    buscarPorId
 };
