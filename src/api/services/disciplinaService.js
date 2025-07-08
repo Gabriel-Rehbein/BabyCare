@@ -1,4 +1,5 @@
 import * as disciplinaRepository from '../repository/disciplinaRepository.js';
+import { ApiError } from '../../utils/ApiError.js';
 
 async function listar() {
     return await disciplinaRepository.listar();
