@@ -6,7 +6,7 @@ import passport from 'passport';
 import 'dotenv/config'; // Carrega as variáveis de ambiente
 
 // Importa os módulos da aplicação com a extensão .js
-import ApiError from './src/utils/ApiError.js';
+import { ApiError } from './src/utils/ApiError.js';
 import './src/config/passport-setup.js'; // Apenas executa o arquivo de configuração
 
 // Rotas

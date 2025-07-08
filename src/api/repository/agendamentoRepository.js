@@ -3,7 +3,7 @@ import pool from '../../config/database.js';
 async function buscarPorId(id) {
     if (!id || !Number.isInteger(Number(id))) return null;
     
-    const [linhas] = await pool.query('SELECT * FROM Disciplina WHERE id = ?', [id]);
+    const [linhas] = await pool.query('SELECT * FROM Agendamento WHERE id = ?', [id]);
     return linhas[0] || null;
 }
 

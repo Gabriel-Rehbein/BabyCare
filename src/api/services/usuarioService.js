@@ -1,6 +1,6 @@
 import * as usuarioRepository from '../repository/usuarioRepository.js';
 // O caminho foi corrigido de '../error/ApiError.js' para o local correto.
-import ApiError from '../../utils/ApiError.js';
+import { ApiError } from '../../utils/ApiError.js';
 
 async function listar() {
     return await usuarioRepository.listar();

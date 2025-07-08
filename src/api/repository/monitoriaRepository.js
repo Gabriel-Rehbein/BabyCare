@@ -2,7 +2,7 @@ import pool from '../../config/database.js';
 
 async function buscarPorId(id) {
     if (!id || !Number.isInteger(Number(id))) return null;
-    
+
     const [linhas] = await pool.query('SELECT id, disciplina_id, monitor_id, horarios_disponiveis, local, status FROM Monitoria WHERE id = ?', [id]);
     return linhas[0] || null;
 }
@@ -28,7 +28,42 @@ async function listar() {
     return linhas;
 }
 
+async function atualizar(id, dadosParaAtualizar) {
+    const camposPermitidos = ['horarios_disponiveis', 'local', 'status']; // Apenas campos que o usuário pode mudar
+    const camposParaQuery = [];
+    const valoresParaQuery = [];
+
+    camposPermitidos.forEach(chave => {
+        if (dadosParaAtualizar[chave] !== undefined) {
+            const valor = typeof dadosParaAtualizar[chave] === 'object'
+                ? JSON.stringify(dadosParaAtualizar[chave])
+                : dadosParaAtualizar[chave];
+                
+            camposParaQuery.push(`${chave} = ?`);
+            valoresParaQuery.push(valor);
+        }
+    });
+
+    if (camposParaQuery.length === 0) {
+        return await buscarPorId(id);
+    }
+
+    valoresParaQuery.push(id);
+
+    const sql = `UPDATE Monitoria SET ${camposParaQuery.join(', ')} WHERE id = ?`;
+    valoresParaQuery.push(id);
+
+    const [result] = await pool.execute(sql, valoresParaQuery);
+
+    if (result.affectedRows === 0) {
+        return null;
+    }
+
+    return await buscarPorId(id);
+}
+
 export {
     listar,
-    buscarPorId
+    buscarPorId,
+    atualizar
 };
