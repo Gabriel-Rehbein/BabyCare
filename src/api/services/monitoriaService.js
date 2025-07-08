@@ -44,8 +44,39 @@ async function atualizar(id, dadosAtualizados) {
     return monitoriaAtualizada;
 }
 
+async function deletar(id) {
+    const idNumerico = Number(id);
+    if (!idNumerico || !Number.isInteger(idNumerico)) {
+        throw new ApiError(400, 'ID de monitoria inválido.');
+    }
+
+    const sucesso = await monitoriaRepository.desativar(idNumerico);
+    if (!sucesso) {
+        throw new ApiError(404, 'Monitoria não encontrada para desativar.');
+    }
+    
+    return;
+}
+
+async function reativar(id) {
+    const idNumerico = Number(id);
+    if (!idNumerico || !Number.isInteger(idNumerico)) {
+        throw new ApiError(400, 'ID de monitoria inválido.');
+    }
+
+    const sucesso = await monitoriaRepository.reativar(idNumerico);
+    if (!sucesso) {
+        throw new ApiError(404, 'Monitoria não encontrada para reativar.');
+    }
+    
+    // Retorna o usuário completo após a reativação
+    return await monitoriaRepository.buscarPorId(idNumerico);
+}
+
 export {
     listar,
     buscarPorId,
-    atualizar
+    atualizar,
+    deletar,
+    reativar
 };

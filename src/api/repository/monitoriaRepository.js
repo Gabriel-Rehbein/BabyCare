@@ -28,42 +28,58 @@ async function listar() {
     return linhas;
 }
 
+/**
+ * Atualiza os dados de uma monitoria específica no banco de dados.
+ * @param {number} id O ID da monitoria a ser atualizada.
+ * @param {object} dadosParaAtualizar Um objeto contendo os campos a serem atualizados.
+ * @returns {Promise<object|null>} O objeto da monitoria atualizada.
+ */
 async function atualizar(id, dadosParaAtualizar) {
-    const camposPermitidos = ['horarios_disponiveis', 'local', 'status']; // Apenas campos que o usuário pode mudar
-    const camposParaQuery = [];
-    const valoresParaQuery = [];
+    const camposPermitidos = ['horarios_disponiveis', 'local', 'status'];
+    const dadosParaSet = {};
 
     camposPermitidos.forEach(chave => {
         if (dadosParaAtualizar[chave] !== undefined) {
-            const valor = typeof dadosParaAtualizar[chave] === 'object'
-                ? JSON.stringify(dadosParaAtualizar[chave])
-                : dadosParaAtualizar[chave];
-                
-            camposParaQuery.push(`${chave} = ?`);
-            valoresParaQuery.push(valor);
+            if (chave === 'horarios_disponiveis' && typeof dadosParaAtualizar[chave] === 'object') {
+                dadosParaSet[chave] = JSON.stringify(dadosParaAtualizar[chave]);
+            } else {
+                dadosParaSet[chave] = dadosParaAtualizar[chave];
+            }
         }
     });
 
-    if (camposParaQuery.length === 0) {
+    if (Object.keys(dadosParaSet).length === 0) {
         return await buscarPorId(id);
     }
 
-    valoresParaQuery.push(id);
+    const sql = 'UPDATE Monitoria SET ? WHERE id = ?';
+    
+    // CORREÇÃO: Trocado pool.execute() por pool.query().
+    // O método query() suporta a interpolação de objetos para a cláusula SET,
+    // enquanto o execute() não, o que causava o erro de sintaxe SQL.
+    await pool.query(sql, [dadosParaSet, id]);
 
-    const sql = `UPDATE Monitoria SET ${camposParaQuery.join(', ')} WHERE id = ?`;
-    valoresParaQuery.push(id);
-
-    const [result] = await pool.execute(sql, valoresParaQuery);
-
-    if (result.affectedRows === 0) {
-        return null;
-    }
-
+    // Retorna o registro atualizado para confirmar a alteração.
     return await buscarPorId(id);
+}
+
+// Função de desativação (soft delete)
+async function desativar(id) {
+    const sql = `UPDATE monitoria SET status = FALSE WHERE id = ?`;
+    const [result] = await pool.execute(sql, [id]);
+    return result.affectedRows > 0;
+}
+
+async function reativar(id) {
+    const sql = `UPDATE monitoria SET status = TRUE WHERE id = ?`;
+    const [result] = await pool.execute(sql, [id]);
+    return result.affectedRows > 0;
 }
 
 export {
     listar,
     buscarPorId,
-    atualizar
+    atualizar,
+    desativar,
+    reativar
 };

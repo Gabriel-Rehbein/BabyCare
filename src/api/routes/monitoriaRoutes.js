@@ -28,5 +28,10 @@ router.get('/:id', isLoggedIn, monitoriaController.buscarUma);
 //PATCH / -> Atualizar uma monitoria pelo ID.
 router.patch('/:id', isLoggedIn, validaId, regrasDeAtualizacao, monitoriaController.atualizarUma);
 
-//DELETE / -> Deletar uma monitoria pelo ID.
+// DELETE /:id -> Desativar uma monitoria (soft delete)
+router.delete('/:id', isLoggedIn, monitoriaController.deletarUma);
+
+//PATCH /:id/reativar -> Reativa uma monitoria.
+router.patch('/:id/reativar', isLoggedIn, monitoriaController.reativarUma);
+
 export default router;

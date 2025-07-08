@@ -46,8 +46,32 @@ const atualizarUma = async (req, res, next) => {
     }
 };
 
+// Controller para desativar (soft delete) um usuário
+const deletarUma = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        await monitoriaService.deletar(id);
+        // Resposta 204 No Content é o padrão para DELETE bem-sucedido
+        res.status(204).send(); 
+    } catch (error) {
+        next(error);
+    }
+};
+
+const reativarUma = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const monitoriaReativada = await monitoriaService.reativar(id);
+        res.status(200).json(monitoriaReativada);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export {
     listarTodas,
     buscarUma,
-    atualizarUma
+    atualizarUma,
+    deletarUma,
+    reativarUma
 };
