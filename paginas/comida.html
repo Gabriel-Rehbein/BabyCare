@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BabyCare — Comida</title>
+  <meta name="description" content="Cardápio, alergias e registros de refeições.">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/animation.css">
+  <style>
+    .food-card{background:#fff7e8;border:1.5px solid #00000025;border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .food-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:linear-gradient(#d6a674,#d29d6c);color:#1d160e}
+    .food-title{font-weight:800}
+    .food-body{padding:12px}
+    .food-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .food-item{border:1px solid #00000015;border-radius:10px;background:#fff;padding:10px}
+    .food-item strong{display:block}
+    .tag{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;font-size:.78rem;border:1px solid #00000020;background:#ffe8cc}
+    .alergias{background:#ffe0e0;border:1.5px dashed #cc5f63;color:#3a1111;border-radius:14px;padding:12px}
+  </style>
+</head>
+<body>
+  <header class="bc-header">
+    <div class="bc-header__wrap">
+      <a class="bc-icon-btn" href="../index.html" aria-label="Voltar ao menu">
+        <img src="../img/icons/arrow-left.svg" alt="Voltar"/>
+      </a>
+      <h1 class="bc-header__title">COMIDA</h1>
+      <button class="bc-icon-btn" id="btn-config" aria-label="Configurações">
+        <img src="../img/icons/gear.svg" alt="Configurações"/>
+      </button>
+    </div>
+  </header>
+
+  <main class="bc-main">
+    <!-- Resumo de hoje -->
+    <section class="reveal">
+      <article class="food-card">
+        <div class="food-head">
+          <div class="food-title">Hoje</div>
+          <div style="font-weight:700">Calorias aprox.: 1.250</div>
+        </div>
+        <div class="food-body">
+          <div class="food-list">
+            <div class="food-item">
+              <strong>Café da manhã</strong>
+              <span>Leite + pão integral com queijo</span>
+              <span class="tag">08:00</span>
+            </div>
+            <div class="food-item">
+              <strong>Lanche</strong>
+              <span>Maçã + iogurte natural</span>
+              <span class="tag">10:15</span>
+            </div>
+            <div class="food-item">
+              <strong>Almoço</strong>
+              <span>Arroz, feijão, frango grelhado, salada</span>
+              <span class="tag">12:30</span>
+            </div>
+            <div class="food-item">
+              <strong>Lanche</strong>
+              <span>Banana amassada com aveia</span>
+              <span class="tag">15:30</span>
+            </div>
+            <div class="food-item">
+              <strong>Jantar</strong>
+              <span>Purê de batata, carne moída, legumes</span>
+              <span class="tag">19:00</span>
+            </div>
+            <div class="food-item">
+              <strong>Ceia</strong>
+              <span>Leite morno</span>
+              <span class="tag">21:00</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Alergias e restrições -->
+    <section class="reveal" style="margin-top:16px">
+      <div class="alergias">
+        <strong>Alergias/Restrições</strong>
+        <ul style="margin:8px 0 0 18px">
+          <li>Sem amendoim</li>
+          <li>Intolerância leve à lactose — preferir iogurte sem lactose</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Registro rápido -->
+    <section class="reveal" style="margin-top:16px">
+      <ul class="bc-grid">
+        <li class="bc-card">
+          <button class="bc-card__link" style="grid-template-rows:auto auto" data-action="quick-add" aria-label="Adicionar refeição">
+            <div style="padding:12px 12px 0 12px">
+              <strong>Adicionar refeição</strong>
+              <p class="muted" style="margin:6px 0 0 0; color:#333">Registrar o que ele comeu</p>
+            </div>
+            <span class="bc-card__title">Novo</span>
+          </button>
+        </li>
+        <li class="bc-card">
+          <a class="bc-card__link" style="grid-template-rows:auto auto" href="#semana">
+            <div style="padding:12px 12px 0 12px">
+              <strong>Plano semanal</strong>
+              <p class="muted" style="margin:6px 0 0 0; color:#333">Ver cardápio da semana</p>
+            </div>
+            <span class="bc-card__title">Ver</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Plano semanal simples -->
+    <section id="semana" class="reveal" style="margin-top:16px">
+      <article class="bc-child__card" style="background:#eaf8e2">
+        <header class="bc-child__head">
+          <div class="bc-child__avatar">
+            <img src="../img/icons/meal.svg" alt="Plano semanal" />
+          </div>
+          <div class="bc-child__meta">
+            <h2 class="bc-child__name">Plano semanal</h2>
+            <p class="bc-child__label">Sugestão balanceada</p>
+          </div>
+          <div></div>
+        </header>
+        <div style="margin-top:10px">
+          <table style="width:100%; border-collapse:collapse; font-size:.9rem; background:#fff; border:1px solid #00000018;border-radius:12px; overflow:hidden">
+            <thead style="background:#ddd; text-align:left">
+              <tr>
+                <th style="padding:8px">Dia</th>
+                <th style="padding:8px">Almoço</th>
+                <th style="padding:8px">Jantar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:8px">Seg</td><td style="padding:8px">Arroz, feijão, frango, salada</td><td style="padding:8px">Sopa de legumes</td></tr>
+              <tr><td style="padding:8px">Ter</td><td style="padding:8px">Macarrão ao sugo + carne</td><td style="padding:8px">Omelete + salada</td></tr>
+              <tr><td style="padding:8px">Qua</td><td style="padding:8px">Arroz, feijão, peixe, legumes</td><td style="padding:8px">Purê + frango desfiado</td></tr>
+              <tr><td style="padding:8px">Qui</td><td style="padding:8px">Escondidinho de carne</td><td style="padding:8px">Risoto de frango</td></tr>
+              <tr><td style="padding:8px">Sex</td><td style="padding:8px">Arroz, feijão, carne moída</td><td style="padding:8px">Panqueca integral</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <aside class="bc-ribbon" role="note">
+    <p>Registre refeições para acompanhar hábitos e alergias.</p>
+  </aside>
+
+  <button class="bc-fab" id="btn-fab" aria-label="Ação rápida" data-action="quick-add">+</button>
+
+  <script src="../js/script.js" defer></script>
+</body>
+</html>

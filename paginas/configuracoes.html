@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BabyCare — Configurações</title>
+  <meta name="description" content="Preferências do app, perfis, responsáveis e privacidade.">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/animation.css">
+  <style>
+    .cfg-card{background:#f3f1fb;border:1.5px solid #00000025;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+    .cfg-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:linear-gradient(#b5b1ff,#7a3cff);color:#120b2b}
+    .cfg-title{font-weight:800;letter-spacing:.02em}
+    .cfg-body{padding:12px;background:#fff}
+
+    .row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #00000015}
+    .row:last-child{border-bottom:none}
+    .row small{display:block;color:#555}
+    .row .label{font-weight:800}
+
+    /* Switch simples */
+    .switch{position:relative;width:48px;height:26px}
+    .switch input{display:none}
+    .slider{position:absolute;inset:0;border-radius:999px;background:#ddd;border:1px solid #bbb;transition:.2s}
+    .slider::before{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:.2s}
+    .switch input:checked + .slider{background:#7a3cff}
+    .switch input:checked + .slider::before{transform:translateX(22px)}
+
+    /* Lista simples */
+    .list{list-style:none;margin:0;padding:0}
+    .list li{padding:10px 0;border-bottom:1px solid #00000015}
+    .list li:last-child{border-bottom:none}
+
+    .btn-line{display:inline-flex;gap:8px;flex-wrap:wrap}
+    .btn-ghost{border:1px solid #00000035;border-radius:10px;background:#fff;color:#1a1a1a;padding:8px 12px;text-decoration:none}
+  </style>
+</head>
+<body>
+  <header class="bc-header">
+    <div class="bc-header__wrap">
+      <a class="bc-icon-btn" href="../index.html" aria-label="Voltar ao menu">
+        <img src="../img/icons/arrow-left.svg" alt="Voltar"/>
+      </a>
+      <h1 class="bc-header__title">CONFIGURAÇÕES</h1>
+      <span class="bc-icon-btn" aria-hidden="true"></span>
+    </div>
+  </header>
+
+  <main class="bc-main">
+    <!-- Perfis de criança -->
+    <section class="reveal">
+      <article class="cfg-card">
+        <div class="cfg-head">
+          <div class="cfg-title">Perfis de criança</div>
+          <button class="bc-icon-btn" data-action="add-child" aria-label="Adicionar perfil">+</button>
+        </div>
+        <div class="cfg-body">
+          <ul class="list">
+            <li>
+              <strong>João (5 anos)</strong>
+              <div class="btn-line" style="margin-top:8px">
+                <a class="btn-ghost" href="#">Editar</a>
+                <button class="btn-ghost" data-action="quick-add">Duplicar</button>
+                <button class="btn-ghost" data-action="quick-add">Remover</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <!-- Responsáveis -->
+    <section class="reveal" style="margin-top:16px">
+      <article class="cfg-card">
+        <div class="cfg-head">
+          <div class="cfg-title">Responsáveis</div>
+          <button class="bc-icon-btn" data-action="quick-add" aria-label="Convidar responsável">+</button>
+        </div>
+        <div class="cfg-body">
+          <ul class="list">
+            <li><strong>Mãe</strong> — admin</li>
+            <li><strong>Pai</strong> — editor</li>
+            <li><strong>Avó</strong> — leitor</li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <!-- Notificações -->
+    <section class="reveal" style="margin-top:16px">
+      <article class="cfg-card">
+        <div class="cfg-head">
+          <div class="cfg-title">Notificações</div>
+        </div>
+        <div class="cfg-body">
+          <div class="row">
+            <div>
+              <div class="label">Lembretes de remédio</div>
+              <small>Receber alerta nos horários definidos</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="row">
+            <div>
+              <div class="label">Eventos do calendário</div>
+              <small>Notificar 30 minutos antes</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="row">
+            <div>
+              <div class="label">Mudanças de localização</div>
+              <small>Alertas ao chegar/sair da escola</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Aparência -->
+    <section class="reveal" style="margin-top:16px">
+      <article class="cfg-card">
+        <div class="cfg-head">
+          <div class="cfg-title">Aparência</div>
+        </div>
+        <div class="cfg-body">
+          <div class="row">
+            <div>
+              <div class="label">Tema escuro</div>
+              <small>Reduz brilho para uso noturno</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-dark">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Privacidade e dados -->
+    <section class="reveal" style="margin-top:16px">
+      <article class="cfg-card">
+        <div class="cfg-head">
+          <div class="cfg-title">Privacidade & Dados</div>
+        </div>
+        <div class="cfg-body">
+          <div class="row">
+            <div>
+              <div class="label">Sincronizar em nuvem</div>
+              <small>Habilita backup e compartilhamento</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-sync" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="row">
+            <div>
+              <div class="label">Exportar dados (PDF)</div>
+              <small>Gerar relatório semanal/mensal</small>
+            </div>
+            <div class="btn-line">
+              <button class="btn-ghost" data-action="quick-add">Semanal</button>
+              <button class="btn-ghost" data-action="quick-add">Mensal</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <aside class="bc-ribbon" role="note">
+    <p>Altere preferências e gerencie perfis.</p>
+  </aside>
+
+  <button class="bc-fab" id="btn-fab" aria-label="Ação rápida" data-action="quick-add">+</button>
+
+  <script src="../js/script.js" defer></script>
+  <script>
+    // Exemplo de toggle de tema (salva preferência simples)
+    (function(){
+      const tgl = document.getElementById('toggle-dark');
+      if(!tgl) return;
+      const KEY='bc_theme_dark';
+      try{
+        const saved = localStorage.getItem(KEY);
+        if(saved==='1'){
+          document.body.dataset.theme='dark';
+          tgl.checked=true;
+        }
+        tgl.addEventListener('change',()=>{
+          if(tgl.checked){
+            document.body.dataset.theme='dark';
+            localStorage.setItem(KEY,'1');
+          } else {
+            document.body.removeAttribute('data-theme');
+            localStorage.removeItem(KEY);
+          }
+        });
+      }catch(err){}
+    })();
+  </script>
+</body>
+</html>
