@@ -1,28 +1,31 @@
+import './src/config/passport-setup.js';
+import dotenv from 'dotenv';
+import pool from './src/config/database.js';
 import app from './app.js';
-import pool from './src/config/database.js'
 
-const PORT = process.env.port || 3000;
+dotenv.config();
 
-// Função para iniciar o servidor
-const startServer = () => {
-    app.listen(PORT, () => {
-        console.log(`Servidor rodando na porta ${PORT}.`);
-        console.log(`Acesso http://localhost:${PORT} para testar sua conexão.`);
-    });
-};
+const PORT = process.env.PORT || 3000;
 
-// Tente conectar ao banco de dados antes de iniciar o servidor
-pool.getConnection()
-    .then(connection => {
-        console.log('Conexão com o banco de dados bem-sucedida.');
-        connection.release(); // Libere a conexão de volta para o pool
-        startServer(); // Inicie o servidor se a conexão for bem-sucedida
-    })
-    .catch(error => {
+// Função para iniciar o servidor após verificar a conexão com o banco
+async function startServer() {
+    try {
+        await pool.query('SELECT 1');
+        console.log('Conexão com o banco de dados PostgreSQL bem-sucedida.');
+
+        app.listen(PORT, () => {
+            console.log(`Servidor rodando na porta ${PORT}`);
+            console.log(`Acesse http://localhost:${PORT} para testar sua conexão`);
+        });
+    } catch (error) {
         console.error('####################################################');
-        console.error('ERRO: Não foi possível conectar ao banco de dados.');
-        console.error('Verifique se o serviço MySQL está em execução e se as credenciais em src/config/database.js estão corretas.');
+        console.error('ERRO: Não foi possível conectar ao banco de dados PostgreSQL.');
+        console.error('Verifique se o serviço PostgreSQL está em execução e se as');
+        console.error('credenciais em .env estão corretas.');
         console.error('Detalhes do erro:', error.message);
         console.error('####################################################');
-        process.exit(1); // Saia do processo com um código de erro
-    });
+        process.exit(1);
+    }
+}
+
+startServer();

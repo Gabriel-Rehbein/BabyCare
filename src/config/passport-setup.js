@@ -1,54 +1,58 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import dotenv from 'dotenv';
 import * as usuarioRepository from '../api/repository/usuarioRepository.js';
 
-// Salva o ID do usuário na sessão
+dotenv.config();
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || (process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/auth/google/callback` : 'http://localhost:3000/auth/google/callback');
+
+if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    console.warn('Aviso: GOOGLE_CLIENT_ID ou GOOGLE_CLIENT_SECRET não estão configurados. O login via Google não funcionará até isso ser definido.');
+}
+
+passport.use(new GoogleStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: CALLBACK_URL
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        const googleId = profile.id;
+        const email = profile.emails && profile.emails[0] && profile.emails[0].value;
+        const nome = profile.displayName || (profile.name && `${profile.name.givenName} ${profile.name.familyName}`) || 'Usuário Google';
+
+        // Tenta achar usuário existente
+        let usuario = await usuarioRepository.buscarPorGoogleId(googleId);
+        if (usuario) {
+            return done(null, usuario);
+        }
+
+        // Se não existe, cria um novo usuário
+        const novoUsuario = {
+            nome,
+            email,
+            googleId
+        };
+
+        usuario = await usuarioRepository.criar(novoUsuario);
+        return done(null, usuario);
+    } catch (err) {
+        return done(err);
+    }
+}));
+
 passport.serializeUser((user, done) => {
+    // Armazena somente o id na sessão
     done(null, user.id);
 });
 
-// Busca o usuário completo a partir do ID salvo na sessão
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = await usuarioRepository.buscarPorId(id);
-        done(null, user);
+        const usuario = await usuarioRepository.buscarPorId(id);
+        return done(null, usuario || null);
     } catch (err) {
-        done(err, null);
+        return done(err);
     }
 });
-
-passport.use(
-    new GoogleStrategy({
-        // Opções da estratégia do Google
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL
-    }, async (accessToken, refreshToken, profile, done) => {
-        // Esta função é chamada quando o usuário faz login com sucesso
-        console.log('Perfil do Google recebido:', profile);
-
-        try {
-            // 1. Verificar se o usuário já existe no nosso banco de dados
-            let usuario = await usuarioRepository.buscarPorGoogleId(profile.id);
-
-            if (usuario) {
-                // Se existe, continue com o login
-                console.log('Usuário já existe:', usuario);
-                return done(null, usuario);
-            } else {
-                // Se não existe, crie um novo usuário
-                const novoUsuario = {
-                    googleId: profile.id,
-                    nome: profile.displayName,
-                    email: profile.emails[0].value,
-                    // O banco de dados cuidará dos valores padrão para 'tipo', 'ativo', etc.
-                };
-                usuario = await usuarioRepository.criar(novoUsuario);
-                console.log('Novo usuário criado:', usuario);
-                return done(null, usuario);
-            }
-        } catch (error) {
-            return done(error, null);
-        }
-    })
-);

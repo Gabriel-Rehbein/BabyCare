@@ -23,22 +23,6 @@ const buscarUm = async (req, res, next) => {
 };
 
 // Controller para atualizar os dados de um usuário
-const atualizarUm = async (req, res, next) => {
-    // Verifica se houve erros de validação (definidos na rota)
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    
-    try {
-        const { id } = req.params;
-        const dadosAtualizados = req.body;
-        const usuarioAtualizado = await usuarioService.atualizar(id, dadosAtualizados);
-        res.status(200).json(usuarioAtualizado);
-    } catch (error) {
-        next(error);
-    }
-};
 
 // Controller para desativar (soft delete) um usuário
 const deletarUm = async (req, res, next) => {
@@ -66,7 +50,6 @@ const reativarUm = async (req, res, next) => {
 export {
     listarTodos,
     buscarUm,
-    atualizarUm,
     deletarUm,
     reativarUm
 };

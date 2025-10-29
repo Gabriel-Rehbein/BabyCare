@@ -24,8 +24,6 @@ router.get('/', isLoggedIn, usuarioController.listarTodos);
 // GET /:id -> Buscar um usuário específico pelo ID
 router.get('/:id', isLoggedIn, usuarioController.buscarUm);
 
-// PATCH /:id -> Atualizar dados de um usuário
-router.patch('/:id', isLoggedIn, regrasDeAtualizacao, usuarioController.atualizarUm);
 
 // DELETE /:id -> Desativar um usuário (soft delete)
 router.delete('/:id', isLoggedIn, usuarioController.deletarUm);

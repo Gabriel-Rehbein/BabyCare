@@ -7,71 +7,48 @@ async function listar() {
 }
 
 async function buscarPorId(id) {
-    const idNumerico = Number(id);
-    if (!idNumerico || !Number.isInteger(idNumerico)) {
+    if (!id) {
         throw new ApiError(400, 'ID de usuário inválido.');
     }
-    
-    const usuario = await usuarioRepository.buscarPorId(idNumerico);
+
+    const usuario = await usuarioRepository.buscarPorId(id);
     if (!usuario) {
         throw new ApiError(404, 'Usuário não encontrado.');
     }
     return usuario;
 }
 
-async function atualizar(id, dadosAtualizados) {
-    const idNumerico = Number(id);
-     if (!idNumerico || !Number.isInteger(idNumerico)) {
-        throw new ApiError(400, 'ID de usuário inválido.');
-    }
-    
-    const usuarioExistente = await usuarioRepository.buscarPorId(idNumerico);
-    if (!usuarioExistente) {
-        throw new ApiError(404, 'Usuário não encontrado para atualizar.');
-    }
-    if (!usuarioExistente.ativo) {
-        throw new ApiError(403, 'Não é possível atualizar um usuário inativo.');
-    }
-
-    const usuarioAtualizado = await usuarioRepository.atualizar(idNumerico, dadosAtualizados);
-    
-    return usuarioAtualizado;
-}
-
 // A função agora desativa o usuário
 async function deletar(id) {
-    const idNumerico = Number(id);
-    if (!idNumerico || !Number.isInteger(idNumerico)) {
+    if (!id) {
         throw new ApiError(400, 'ID de usuário inválido.');
     }
 
-    const sucesso = await usuarioRepository.desativar(idNumerico);
+    const sucesso = await usuarioRepository.desativar(id);
     if (!sucesso) {
         throw new ApiError(404, 'Usuário não encontrado para desativar.');
     }
-    
+
     return;
 }
 
 async function reativar(id) {
-    const idNumerico = Number(id);
-    if (!idNumerico || !Number.isInteger(idNumerico)) {
+    if (!id) {
         throw new ApiError(400, 'ID de usuário inválido.');
     }
 
-    const sucesso = await usuarioRepository.reativar(idNumerico);
+    const sucesso = await usuarioRepository.reativar(id);
     if (!sucesso) {
         throw new ApiError(404, 'Usuário não encontrado para reativar.');
     }
-    
+
     // Retorna o usuário completo após a reativação
-    return await usuarioRepository.buscarPorId(idNumerico);
+    return await usuarioRepository.buscarPorId(id);
 }
 
 export {
     listar,
     buscarPorId,
-    atualizar,
     deletar,
     reativar
 };

@@ -2,79 +2,52 @@ import pool from '../../config/database.js';
 
 // Helper para reutilizar a busca
 async function buscarPorId(id) {
-    if (!id || !Number.isInteger(Number(id))) return null;
-    // Seleciona todas as colunas da nova tabela
-    const [linhas] = await pool.query('SELECT id, googleId, nome, email, curso, semestre, tipo, ativo, criado_em, atualizado_em FROM Usuario WHERE id = ?', [id]);
-    return linhas[0] || null;
+    if (!id) return null;
+    // Seleciona todas as colunas da tabela (aceita UUIDs ou strings)
+    const { rows } = await pool.query('SELECT id, nome, email, google_id, criado_em FROM usuarios WHERE id = $1', [id]);
+    return rows[0] || null;
 }
 
 async function listar() {
-    // Retorna apenas usuários ativos e um conjunto limitado de colunas para a listagem geral
-    const [linhas] = await pool.query('SELECT id, googleId, nome, email, curso, semestre, tipo, ativo, criado_em, atualizado_em FROM Usuario WHERE ativo = TRUE');
-    return linhas;
+    // Retorna todos os usuários
+    const { rows } = await pool.query('SELECT id, nome, email, google_id, criado_em FROM usuarios');
+    return rows;
 }
 
-async function atualizar(id, dadosParaAtualizar) {
-    const camposPermitidos = ['nome', 'curso', 'semestre']; // Apenas campos que o usuário pode mudar
-    const camposParaQuery = [];
-    const valoresParaQuery = [];
 
-    camposPermitidos.forEach(chave => {
-        if (dadosParaAtualizar[chave] !== undefined) {
-            camposParaQuery.push(`${chave} = ?`);
-            valoresParaQuery.push(dadosParaAtualizar[chave]);
-        }
-    });
-
-    if (camposParaQuery.length === 0) {
-        return await buscarPorId(id);
-    }
-
-    const sql = `UPDATE Usuario SET ${camposParaQuery.join(', ')} WHERE id = ?`;
-    valoresParaQuery.push(id);
-
-    const [result] = await pool.execute(sql, valoresParaQuery);
-
-    if (result.affectedRows === 0) {
-        return null;
-    }
-
-    return await buscarPorId(id);
-}
-
-// Função de desativação (soft delete)
-async function desativar(id) {
-    const sql = `UPDATE Usuario SET ativo = FALSE WHERE id = ?`;
-    const [result] = await pool.execute(sql, [id]);
-    return result.affectedRows > 0;
-}
-
-async function reativar(id) {
-    const sql = `UPDATE Usuario SET ativo = TRUE WHERE id = ?`;
-    const [result] = await pool.execute(sql, [id]);
-    return result.affectedRows > 0;
-}
+// Remove funções de ativação/desativação pois não temos mais a coluna 'ativo'
 
 // Funções de autenticação
 async function buscarPorGoogleId(googleId) {
-    const [rows] = await pool.execute('SELECT * FROM Usuario WHERE googleId = ?', [googleId]);
+    const { rows } = await pool.query('SELECT * FROM usuarios WHERE google_id = $1', [googleId]);
     return rows[0];
 }
 
 async function criar(usuario) {
     const { nome, email, googleId } = usuario;
-    // O banco de dados cuidará dos valores padrão para 'tipo', 'ativo', 'criado_em', 'atualizado_em'
-    const sql = 'INSERT INTO Usuario (nome, email, googleId) VALUES (?, ?, ?)';
-    const [result] = await pool.execute(sql, [nome, email, googleId]);
-    return await buscarPorId(result.insertId);
+    const sql = 'INSERT INTO usuarios (nome, email, google_id) VALUES ($1, $2, $3) RETURNING *';
+    const { rows } = await pool.query(sql, [nome, email, googleId]);
+    return rows[0];
+}
+
+// Remove (hard) usuário — usado para operações administrativas
+async function desativar(id) {
+    if (!id) return false;
+    const result = await pool.query('DELETE FROM usuarios WHERE id = $1', [id]);
+    return result.rowCount > 0;
+}
+
+// Reativar não é suportado quando usamos delete; mantém para compatibilidade da API
+async function reativar(id) {
+    // Não há operação de reativação com exclusão física; retornar false para sinalizar não encontrado
+    return false;
 }
 
 export {
     listar,
     buscarPorId,
-    atualizar,
-    desativar,
-    reativar,
     buscarPorGoogleId,
-    criar
+    criar,
+    desativar,
+    reativar
 };

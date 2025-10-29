@@ -11,9 +11,7 @@ import './src/config/passport-setup.js'; // Apenas executa o arquivo de configur
 
 // Rotas
 import usuarioRoutes from './src/api/routes/usuarioRoutes.js';
-import monitoriaRoutes from './src/api/routes/monitoriaRoutes.js';
-import disciplinaRoutes from './src/api/routes/disciplinaRoutes.js';
-import agendamentoRoutes from './src/api/routes/agendamentoRoutes.js';
+import criancaRoutes from './src/api/routes/criancaRoutes.js';
 import authRoutes from './src/api/routes/authRoutes.js';
 
 const app = express();
@@ -48,7 +46,7 @@ app.use(passport.session());
 app.get('/', (req, res) => {
     const htmlResponse = `
         <div style="font-family: sans-serif; text-align: center; padding-top: 50px; color: #333;">
-            <h1>API de Monitoria Acadêmica</h1>
+            <h1>API BabyCare</h1>
             <p>A API está no ar e funcionando.</p>
             <p>Para iniciar o processo de autenticação, clique no link abaixo:</p>
             <a 
@@ -64,9 +62,7 @@ app.get('/', (req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/usuarios', usuarioRoutes);
-app.use('/monitorias', monitoriaRoutes);
-app.use('/disciplinas', disciplinaRoutes);
-app.use('/agendamentos', agendamentoRoutes);
+app.use('/criancas', criancaRoutes);
 // Middleware de Tratamento de Erros
 app.use((err, req, res, next) => {
     console.error("ERRO GLOBAL:", err);
